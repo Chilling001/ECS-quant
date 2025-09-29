@@ -53,6 +53,7 @@ class RandomStrat(bt.Strategy):
         self.state = load_state()
         self.order = None
         self.entry_info = None
+        self._sell_next = False
 
     def next(self):
         # 5% chance to enter long 10 shares at close
@@ -62,6 +63,17 @@ class RandomStrat(bt.Strategy):
             self.order = self.buy(size=size)
             # record entry for messaging
             self.entry_info = {'date_in': str(self.data.datetime.date(0)), 'shares': size, 'entry': float(price)}
+        # if a sell was scheduled after a buy, execute it now (market)
+        elif self._sell_next and self.position:
+            try:
+                # sell entire position on this bar
+                self.sell(exectype=bt.Order.Market, size=int(self.position.size))
+            except Exception:
+                try:
+                    self.close()
+                except Exception:
+                    pass
+            self._sell_next = False
 
     def notify_order(self, order):
         if order.status in [bt.Order.Completed]:
@@ -72,6 +84,11 @@ class RandomStrat(bt.Strategy):
                     send_telegram(msg)
                 except Exception:
                     pass
+                # schedule a market sell on the next bar
+                try:
+                    self._sell_next = True
+                except Exception:
+                    self._sell_next = False
             elif order.issell():
                 try:
                     msg = f"RANDO TRADE CLOSED {order.executed.size} @ {order.executed.price:.2f}"
@@ -84,7 +101,14 @@ class RandomStrat(bt.Strategy):
             try:
                 date_in = self.entry_info.get('date_in') if self.entry_info else ''
                 date_out = str(self.data.datetime.date(0))
-                shares = int(trade.size) if hasattr(trade, 'size') else 10
+                # prefer trade.size if provided by backtrader; otherwise fallback to recorded entry shares
+                try:
+                    shares_val = getattr(trade, 'size', None)
+                    if shares_val is None:
+                        shares_val = (self.entry_info.get('shares') if self.entry_info else None)
+                    shares = int(shares_val) if shares_val is not None else 0
+                except Exception:
+                    shares = 0
                 entry = float(self.entry_info.get('entry')) if self.entry_info else 0.0
                 exitp = float(trade.price) if hasattr(trade, 'price') else 0.0
                 pnl = float(trade.pnl)
@@ -112,6 +136,19 @@ def main():
     DAYS = 60
     df = yf.download('SPY', period=f'{DAYS}d', interval='1d', auto_adjust=True)
     df.dropna(inplace=True)
+    # normalize column names like the main script did
+    new_cols = []
+    for c in df.columns:
+        if isinstance(c, tuple):
+            new_cols.append(str(c[0]).lower())
+        else:
+            new_cols.append(str(c).lower())
+    df.columns = new_cols
+    if 'adj close' in df.columns and 'close' not in df.columns:
+        df['close'] = df['adj close']
+    for req in ('open','high','low','close','volume'):
+        if req not in df.columns:
+            raise RuntimeError(f'missing required column from data: {req}')
     data = bt.feeds.PandasData(dataname=df)
     cerebro = bt.Cerebro()
     cerebro.broker.setcash(100000.0)
