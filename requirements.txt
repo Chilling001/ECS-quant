@@ -17,6 +17,9 @@ requests>=2.31.0
 # GUI (Tkinter is usually included with Python, but listing for documentation)
 # tkinter - included in standard Python distribution
 
+# Modern Web Dashboard
+streamlit>=1.28.0
+
 # Plotting and Visualization
 matplotlib>=3.7.0
 
