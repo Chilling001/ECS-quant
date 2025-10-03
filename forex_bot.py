@@ -501,9 +501,29 @@ class ForexTradingBot:
 
 def main():
     """Main entry point."""
+    import sys
+    
     print("=" * 60)
     print("AI-Powered Forex Trading Bot")
     print("=" * 60)
+    
+    # Check for GUI mode argument
+    if len(sys.argv) > 1 and sys.argv[1] == '--gui':
+        gui_mode = 'tkinter'
+    elif len(sys.argv) > 1 and sys.argv[1] == '--web':
+        gui_mode = 'streamlit'
+    else:
+        # Default to Streamlit (modern web interface)
+        gui_mode = 'streamlit'
+    
+    if gui_mode == 'streamlit':
+        print("\nStarting Streamlit Web Dashboard...")
+        print("Run: streamlit run streamlit_app.py")
+        print("\nAlternatively, run with --gui for legacy Tkinter interface")
+        print("or --web to force Streamlit mode")
+        return
+    
+    # Tkinter mode
     print("\nInitializing bot...")
     
     # Create bot instance
@@ -518,9 +538,9 @@ def main():
         return
     
     print("\nBot initialized successfully!")
-    print("Starting GUI...")
+    print("Starting Tkinter GUI...")
     
-    # Import and start GUI
+    # Import and start Tkinter GUI
     try:
         from forex_gui import ForexBotGUI
         gui = ForexBotGUI(bot)
