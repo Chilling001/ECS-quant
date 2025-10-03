@@ -1,0 +1,24 @@
+# Trading and Market Data
+ccxt>=4.0.0
+backtrader>=1.9.78.123
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Data Sources
+yfinance>=0.2.0
+
+# AI and ML
+openai>=1.0.0
+
+# Telegram Integration
+python-telegram-bot>=20.0
+requests>=2.31.0
+
+# GUI (Tkinter is usually included with Python, but listing for documentation)
+# tkinter - included in standard Python distribution
+
+# Plotting and Visualization
+matplotlib>=3.7.0
+
+# Configuration
+python-dotenv>=1.0.0
