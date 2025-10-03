@@ -2,7 +2,7 @@
 AI Manager Module
 Integrates OpenAI GPT as an AI portfolio manager for trade analysis and suggestions.
 """
-import openai
+from openai import OpenAI
 from datetime import datetime
 import json
 
@@ -21,7 +21,7 @@ class AIPortfolioManager:
             api_key: OpenAI API key
         """
         self.api_key = api_key
-        openai.api_key = api_key
+        self.client = OpenAI(api_key=api_key)
         self.conversation_history = []
         
     def analyze_portfolio(self, account_info, positions, recent_trades):
@@ -39,7 +39,7 @@ class AIPortfolioManager:
         prompt = self._build_analysis_prompt(account_info, positions, recent_trades)
         
         try:
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are an expert forex portfolio manager and risk analyst. Provide concise, actionable insights."},
@@ -138,7 +138,7 @@ Keep response under 200 words.
         messages.append({"role": "user", "content": user_message})
         
         try:
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
                 max_tokens=300,
@@ -189,7 +189,7 @@ Provide brief recommendation (approve/caution/reject) with reasoning.
 """
         
         try:
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a forex risk manager. Evaluate trades critically."},

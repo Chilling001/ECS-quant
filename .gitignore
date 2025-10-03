@@ -30,6 +30,7 @@ env/
 config.py
 *.key
 *.pem
+.streamlit/secrets.toml
 
 # State and Data Files
 *_state.json
