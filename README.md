@@ -9,7 +9,8 @@ An advanced AI-powered forex trading bot built with Python, featuring automated 
 - **AI Portfolio Manager**: OpenAI GPT integration provides real-time portfolio analysis and trading suggestions
 - **Risk Management**: 1% risk per trade, automatic stop-loss (1% below entry) and take-profit (2% above entry)
 - **Telegram Notifications**: Receive instant trade alerts, P&L updates, and AI insights
-- **Interactive GUI**: Tkinter-based interface for configuration, monitoring, and AI chat
+- **Modern Web Dashboard**: Streamlit-based web interface accessible from any browser (new!)
+- **Interactive GUI**: Tkinter-based interface for configuration, monitoring, and AI chat (legacy)
 - **Backtesting**: Test strategies on historical OANDA data using Backtrader
 - **Modular Architecture**: Separate modules for broker connection, strategy, AI, notifications, and GUI
 - **Paper Trading**: Safe practice trading with OANDA demo accounts (no real money required)
@@ -42,7 +43,8 @@ pip install -r requirements.txt
 - `pandas` - Data manipulation
 - `openai` - AI integration
 - `python-telegram-bot` - Telegram notifications
-- `tkinter` - GUI (included with Python)
+- `streamlit` - Modern web dashboard (new!)
+- `tkinter` - GUI (included with Python, legacy)
 - Other dependencies listed in `requirements.txt`
 
 ### 3. Configure API Keys
@@ -102,21 +104,33 @@ TELEGRAM_CHAT_ID = "your_telegram_chat_id_here"
 
 ## 🎯 Usage
 
-### Running the Bot with GUI
+### Running the Bot with Streamlit Dashboard (Recommended)
+
+```bash
+streamlit run app.py
+```
+
+This launches the modern web dashboard in your browser where you can:
+- Configure trading parameters via sidebar
+- Monitor real-time account metrics
+- View positions and trades in interactive tables
+- Chat with the AI Portfolio Manager
+- View system logs and activity
+- Auto-refresh every 5 seconds when bot is running
+
+**See [STREAMLIT_DASHBOARD.md](STREAMLIT_DASHBOARD.md) for complete dashboard documentation.**
+
+### Running the Bot with Tkinter GUI (Legacy)
 
 ```bash
 python forex_bot.py
 ```
 
-This launches the interactive GUI where you can:
-- Configure trading parameters
-- Monitor positions and P&L
-- Chat with the AI assistant
-- View logs and activity
+This launches the traditional desktop GUI with tabs for configuration, dashboard, AI chat, and logs.
 
 ### Running Without GUI (Console Mode)
 
-If tkinter is not available, the bot will run in console mode automatically.
+If neither Streamlit nor tkinter is available, the bot will run in console mode automatically.
 
 ### Configuration Options
 
@@ -209,23 +223,28 @@ The bot sends notifications for:
 
 ```
 ECS-quant/
+├── app.py                    # Streamlit web dashboard (NEW!)
 ├── forex_bot.py              # Main bot orchestrator
 ├── broker_connector.py       # OANDA connection via CCXT
 ├── forex_strategy.py         # Moving average crossover strategy
 ├── ai_manager.py             # OpenAI GPT integration
 ├── telegram_notifier.py      # Telegram notifications
-├── forex_gui.py              # Tkinter GUI interface
+├── forex_gui.py              # Tkinter GUI interface (legacy)
 ├── backtester.py             # Backtesting with Backtrader
 ├── config_template.py        # Configuration template
 ├── requirements.txt          # Python dependencies
 ├── .gitignore               # Git ignore file
 ├── README.md                # This file
+├── STREAMLIT_DASHBOARD.md   # Streamlit dashboard guide (NEW!)
 ├── trendbot.py              # Legacy EMA crossover bot (SPY)
 ├── asymmetricbot.py         # Legacy asymmetric risk bot (SPXL)
 └── randobot.py              # Legacy random entry bot (testing)
 ```
 
 ## ⚙️ Module Descriptions
+
+### `app.py` (NEW!)
+Modern Streamlit web dashboard that provides a browser-based interface for the trading bot. Features include real-time metrics, interactive tables, AI chat, and auto-refresh. See [STREAMLIT_DASHBOARD.md](STREAMLIT_DASHBOARD.md) for details.
 
 ### `forex_bot.py`
 Main controller that orchestrates all components, manages the trading loop, and coordinates between strategy, broker, AI, and notifications.
@@ -272,10 +291,16 @@ Backtesting engine using Backtrader framework. Tests strategies on historical da
 - Check you have API credits available
 - Ensure you're not hitting rate limits
 
-### GUI Not Starting
+### Streamlit Dashboard Not Starting
+- Install streamlit: `pip install streamlit`
+- Check for port conflicts (default: 8501)
+- Try: `streamlit run app.py --server.port 8502`
+
+### Tkinter GUI Not Starting
 - Install tkinter: `sudo apt-get install python3-tk` (Linux)
 - On macOS/Windows, tkinter should be included with Python
 - The bot will fall back to console mode if GUI is unavailable
+- Alternatively, use the Streamlit dashboard: `streamlit run app.py`
 
 ## 📈 Performance Monitoring
 
